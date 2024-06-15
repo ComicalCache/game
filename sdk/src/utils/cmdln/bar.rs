@@ -72,16 +72,19 @@ impl Bar {
 #[cfg(feature = "cmdln")]
 impl Display for Bar {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        use std::fmt::Write; // for writing to string
+
         let mut out = String::new();
 
         // labels
         let mut label_offset = 0;
         if let Some(label) = &self.label_left {
-            out.push_str(label);
+            write!(out, "{label}")?;
             label_offset += label.len();
         }
         if let Some(label) = &self.label_right {
-            out.push_str(&format!(
+            write!(
+                out,
                 "{}{}\n",
                 " ".repeat(
                     self.bracket_left.len() + self.width + self.bracket_right.len()
@@ -89,21 +92,23 @@ impl Display for Bar {
                         - label.len()
                 ),
                 label
-            ));
+            )?;
         }
 
         // bar
-        out.push_str(&format!(
+        write!(
+            out,
             "{}{}{}{}\n",
             self.bracket_left,
             self.fill.repeat(self.progress),
             self.blank.repeat(self.width - self.progress),
             self.bracket_right
-        ));
+        )?;
 
         // progress label
         if let Some(label) = &self.progress_label {
-            out.push_str(&format!(
+            write!(
+                out,
                 "{}^\n{}{}",
                 " ".repeat(min(self.progress + self.bracket_left.len(), self.width)),
                 " ".repeat(min(
@@ -111,7 +116,7 @@ impl Display for Bar {
                     self.width + self.bracket_left.len() - label.len()
                 )),
                 label
-            ));
+            )?;
         }
 
         write!(f, "{out}")

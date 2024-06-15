@@ -202,19 +202,27 @@ impl Display for Stat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         use Stat::*;
 
-        let out = match self {
-            Level { level, xp } => Stat::xp_bar(StatType::Level, *level, *xp),
+        match self {
+            Level { level, xp } => write!(f, "{}", Stat::xp_bar(StatType::Level, *level, *xp)),
             Health {
                 max,
                 current,
                 regen,
-            } => Stat::regen_stat_bar(StatType::Health, *max, *current, *regen),
+            } => write!(
+                f,
+                "{}",
+                Stat::regen_stat_bar(StatType::Health, *max, *current, *regen)
+            ),
             Mana {
                 max,
                 current,
                 regen,
-            } => Stat::regen_stat_bar(StatType::Mana, *max, *current, *regen),
-            Wisdom { level, xp } => Stat::xp_bar(StatType::Wisdom, *level, *xp),
+            } => write!(
+                f,
+                "{}",
+                Stat::regen_stat_bar(StatType::Mana, *max, *current, *regen)
+            ),
+            Wisdom { level, xp } => write!(f, "{}", Stat::xp_bar(StatType::Wisdom, *level, *xp)),
             Defense {
                 physical_armor,
                 magic_resistance,
@@ -229,7 +237,8 @@ impl Display for Stat {
                     utils::const_max(MAGIC_RESISTANCE.len(), DODGE_CHANCE.len()),
                 );
 
-                format!(
+                write!(
+                    f,
                     "{DEFENSE_TITLE:^2$}\n\
                     {ARMOR:<3$} {}\n\
                     {MAGIC_RESISTANCE:<3$} {}\n\
@@ -240,13 +249,15 @@ impl Display for Stat {
                     LABEL_OFFSET,
                 )
             }
-            Crafting { level, xp } => Stat::xp_bar(StatType::Crafting, *level, *xp),
-            Enhancement { level, xp } => Stat::xp_bar(StatType::Enhancement, *level, *xp),
-            Combat { level, xp } => Stat::xp_bar(StatType::Combat, *level, *xp),
-            Magic { level, xp } => Stat::xp_bar(StatType::Magic, *level, *xp),
-            Luck { level, xp } => Stat::xp_bar(StatType::Luck, *level, *xp),
-        };
-
-        write!(f, "{}", out)
+            Crafting { level, xp } => {
+                write!(f, "{}", Stat::xp_bar(StatType::Crafting, *level, *xp))
+            }
+            Enhancement { level, xp } => {
+                write!(f, "{}", Stat::xp_bar(StatType::Enhancement, *level, *xp))
+            }
+            Combat { level, xp } => write!(f, "{}", Stat::xp_bar(StatType::Combat, *level, *xp)),
+            Magic { level, xp } => write!(f, "{}", Stat::xp_bar(StatType::Magic, *level, *xp)),
+            Luck { level, xp } => write!(f, "{}", Stat::xp_bar(StatType::Luck, *level, *xp)),
+        }
     }
 }

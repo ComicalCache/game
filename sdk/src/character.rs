@@ -23,27 +23,26 @@ pub struct Character {
 #[cfg(feature = "cmdln")]
 impl Display for Character {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        use std::fmt::Write; // for writing to string
+
         let mut out = String::new();
 
         // UUID in '[xXxXxX...XxXxXx]' format
-        out.push_str(&format!("{}\n", cmdln::shorten_uuid(self.id)));
+        writeln!(out, "{}", cmdln::shorten_uuid(self.id))?;
 
         // Name
         const NAME_LABEL: &str = "Name";
-        out.push_str(&format!("{NAME_LABEL}: {}\n", self.name));
+        writeln!(out, "{NAME_LABEL}: {}", self.name)?;
 
         // Stats header
         const STATS_TITLE: &str = " STATS ";
-        out.push_str(&format!(
-            "\n {:=^1$} \n",
-            STATS_TITLE,
-            cmdln::config::BAR_WIDTH
-        ));
+        writeln!(out, "\n {:=^1$} ", STATS_TITLE, cmdln::config::BAR_WIDTH)?;
+
         for (_, stat) in self.stats.iter() {
-            out.push_str(&format!("{stat}\n\n"));
+            writeln!(out, "{stat}\n")?;
         }
 
-        // remove the last double linebreak
+        // remove last two linebreaks
         out.pop();
         out.pop();
 
