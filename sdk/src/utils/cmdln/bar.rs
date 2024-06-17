@@ -38,7 +38,7 @@ impl Bar {
     pub fn progress(&mut self, progress: usize, label: Option<String>) {
         assert!(
             progress <= self.width,
-            "Progress percentage must not be bigger than the width"
+            "Progress must not be bigger than the width"
         );
         if let Some(label) = &label {
             assert!(
@@ -110,9 +110,16 @@ impl Display for Bar {
             write!(
                 out,
                 "{}^\n{}{}",
-                " ".repeat(min(self.progress + self.bracket_left.len(), self.width)),
                 " ".repeat(min(
+                    // < 100% progress
+                    self.progress + self.bracket_left.len(),
+                    // = 100% progress, else would overflow bar width to the right
+                    self.width
+                )),
+                " ".repeat(min(
+                    // label wouldn't overflow bar width
                     self.progress + self.bracket_left.len() + 1,
+                    // bar would overflow bar width to the right
                     self.width + self.bracket_left.len() - label.len()
                 )),
                 label
