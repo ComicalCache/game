@@ -4,4 +4,4 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-sdk = { path = "../sdk", version = "0.1.0", features = ["cmdln"] }
+sdk = { path = "../sdk", version = "0.1.0" }
