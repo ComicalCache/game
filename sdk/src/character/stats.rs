@@ -1,4 +1,4 @@
-use crate::XpCurve;
+use crate::xp::xp_curve::XpCurveOption;
 
 pub mod create {
     macro_rules! lvl_xp {
@@ -124,12 +124,31 @@ pub enum Stat {
     },
 }
 
-impl XpCurve for Stat {
-    fn xp_to_next_level(level: u32) -> u64 {
+impl XpCurveOption for Stat {
+    fn xp_to_next_level(&self) -> Option<u64> {
+        use Stat::*;
+
         const BASE_XP: f64 = 1000.0;
         const LINEAR_FACTOR: f64 = 1.7;
         const EXPONENT: f64 = 1.3;
 
-        (BASE_XP * f64::powf(level as f64, EXPONENT) + (level as f64 * LINEAR_FACTOR)) as u64
+        if let Some(level) = match self {
+            Level { level, .. }
+            | Strength { level, .. }
+            | Wisdom { level, .. }
+            | Crafting { level, .. }
+            | Enhancement { level, .. }
+            | Combat { level, .. }
+            | Magic { level, .. }
+            | Luck { level, .. } => Some(*level),
+            _ => None,
+        } {
+            return Some(
+                (BASE_XP * f64::powf(level as f64, EXPONENT) + (level as f64 * LINEAR_FACTOR))
+                    as u64,
+            );
+        }
+
+        None
     }
 }

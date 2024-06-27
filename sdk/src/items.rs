@@ -8,3 +8,4 @@ pub mod material;
 pub use material::Material;
 pub mod weapon;
 pub use weapon::Weapon;
+pub mod bonus_stats;

@@ -1,5 +1,7 @@
 use uuid::Uuid;
 
+use crate::xp::Xp;
+
 #[derive(Debug)]
 pub struct Material {
     id: Uuid,
@@ -17,12 +19,10 @@ impl Material {
             xp,
         }
     }
+}
 
-    pub fn name(&self) -> String {
-        self.name.clone()
-    }
-
-    pub fn xp(&self) -> u64 {
+impl Xp for Material {
+    fn xp(&self) -> u64 {
         self.xp
     }
 }

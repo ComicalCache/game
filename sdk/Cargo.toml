@@ -5,3 +5,4 @@ edition = "2021"
 
 [dependencies]
 uuid = { version = "1.8.0", features = ["v4", "fast-rng"] }
+rand = "0.8.5"
