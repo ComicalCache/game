@@ -2,6 +2,7 @@ use rand::{
     distributions::{Distribution, Standard},
     Rng,
 };
+use rand::seq::IteratorRandom;
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Debug)]
 pub enum BonusStatType {
@@ -50,6 +51,12 @@ impl Distribution<BonusStatType> for Standard {
     }
 }
 
+impl BonusStatType {
+    pub fn random_from<'a, I: Iterator<Item=&'a BonusStatType>>(iter: I) -> Option<&'a Self> {
+        iter.choose(&mut rand::thread_rng())
+    }
+}
+
 #[derive(Debug)]
 pub enum BonusStat {
     MaxHealthFlat(u64),
@@ -71,8 +78,9 @@ pub enum BonusStat {
 }
 
 impl BonusStat {
-    pub fn from_type<R: Rng>(r#type: BonusStatType, rng: &mut R) -> Self {
+    pub fn from_type(r#type: BonusStatType) -> Self {
         use BonusStat::*;
+        let mut rng = rand::thread_rng();
 
         match r#type {
             BonusStatType::MaxHealthFlat => MaxHealthFlat(rng.gen_range(77..137)),
@@ -96,7 +104,9 @@ impl BonusStat {
         }
     }
 
-    pub fn upgrade<R: Rng>(&mut self, rng: &mut R) {
+    pub fn upgrade(&mut self) {
+        let mut rng = rand::thread_rng();
+
         match self {
             BonusStat::MaxHealthFlat(v) => *v += rng.gen_range(27..57),
             BonusStat::MaxHealthPercent(v) => *v += rng.gen_range(0.07..0.22),

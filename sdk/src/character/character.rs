@@ -1,14 +1,13 @@
 use std::collections::BTreeMap;
 
-use crate::character::{
-    stats::{
-        create::{defense, health_mana, lvl_xp, simple},
-        Stat, StatType,
-    },
-    Inventory,
-};
-
 use uuid::Uuid;
+
+use crate::character::{
+    Inventory,
+    stats::{defense, health_mana, lvl_xp, simple,
+            Stat, StatType,
+    },
+};
 
 pub struct Character {
     id: Uuid,
@@ -22,7 +21,7 @@ pub struct Character {
 impl Character {
     pub fn new<S: AsRef<str>>(name: S) -> Self {
         Character {
-            id: uuid::Uuid::new_v4(),
+            id: Uuid::new_v4(),
             name: String::from(name.as_ref()),
 
             stats: BTreeMap::from([

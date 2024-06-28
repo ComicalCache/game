@@ -13,7 +13,7 @@ pub struct Material {
 impl Material {
     pub fn new<S: AsRef<str>>(name: S, xp: u64) -> Self {
         Material {
-            id: uuid::Uuid::new_v4(),
+            id: Uuid::new_v4(),
             name: String::from(name.as_ref()),
 
             xp,

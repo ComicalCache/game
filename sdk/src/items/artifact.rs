@@ -1,6 +1,6 @@
 use std::{cmp::min, collections::BTreeMap};
 
-use rand::{seq::IteratorRandom, Rng};
+use rand::seq::IteratorRandom;
 use uuid::Uuid;
 
 use crate::{
@@ -33,31 +33,29 @@ impl XpCurve for Artifact {
         const LINEAR_FACTOR: f64 = 1.7;
         const EXPONENT: f64 = 1.3;
 
-        (BASE_XP * f64::powf(self.level as f64, EXPONENT) + (self.level as f64 * LINEAR_FACTOR))
-            as u64
+        let level = self.level as f64;
+        (BASE_XP * f64::powf(level, EXPONENT) + (level * LINEAR_FACTOR)) as u64
     }
 }
 
 impl Artifact {
-    pub fn new<S: AsRef<str>>(
-        name: S,
-        main_stat_type: BonusStatType,
-        main_stat: BonusStat,
-    ) -> Self {
+    pub fn new<S: AsRef<str>>(name: S) -> Self {
+        let main_stat_type = rand::random();
+
         Artifact {
-            id: uuid::Uuid::new_v4(),
+            id: Uuid::new_v4(),
             name: String::from(name.as_ref()),
 
             xp: 0,
             level: 1,
 
             main_stat_type,
-            main_stat,
+            main_stat: BonusStat::from_type(main_stat_type),
             sub_stats: BTreeMap::new(),
         }
     }
 
-    pub fn upgrade<R: Rng>(&mut self, xp_source: Vec<Box<dyn Xp>>, rng: &mut R) {
+    pub fn upgrade(&mut self, xp_source: Vec<Box<dyn Xp>>) {
         let mut upgrade_xp = xp_source.iter().map(|s| s.xp()).sum();
 
         while upgrade_xp != 0 {
@@ -70,23 +68,19 @@ impl Artifact {
                 self.level += 1;
 
                 // upgrade main stat
-                self.main_stat.upgrade(rng);
+                self.main_stat.upgrade();
 
-                // upgrade random substat
+                // upgrade random sub stat
                 let sub_stats_len = self.sub_stats.len();
                 if sub_stats_len > 0 && self.level % 2 == 0 {
-                    self.sub_stats
-                        .values_mut()
-                        .choose(rng)
-                        .unwrap()
-                        .upgrade(rng);
+                    self.sub_stats.values_mut().choose(&mut rand::thread_rng()).unwrap().upgrade();
                 }
 
                 if self.level % 4 == 0 {
-                    // add random substat
+                    // add random sub stat
+                    // TODO: implement character wisdom limiter
                     let bonus_stat_type = rand::random();
-                    self.sub_stats
-                        .insert(bonus_stat_type, BonusStat::from_type(bonus_stat_type, rng));
+                    self.sub_stats.insert(bonus_stat_type, BonusStat::from_type(bonus_stat_type));
                 }
             }
         }

@@ -1,7 +1,6 @@
 use crate::xp::xp_curve::XpCurveOption;
 
-pub mod create {
-    macro_rules! lvl_xp {
+macro_rules! lvl_xp {
         ($kind:ident, $lvl:literal, $xp:literal) => {
             (
                 StatType::$kind,
@@ -12,9 +11,9 @@ pub mod create {
             )
         };
     }
-    pub(crate) use lvl_xp;
+pub(in crate::character) use lvl_xp;
 
-    macro_rules! health_mana {
+macro_rules! health_mana {
         ($kind:ident, $max:literal, $curr:literal, $reg:literal) => {
             (
                 StatType::$kind,
@@ -26,16 +25,16 @@ pub mod create {
             )
         };
     }
-    pub(crate) use health_mana;
+pub(in crate::character) use health_mana;
 
-    macro_rules! simple {
+macro_rules! simple {
         ($kind:ident, $val:literal) => {
             (StatType::$kind, Stat::$kind($val))
         };
     }
-    pub(crate) use simple;
+pub(in crate::character) use simple;
 
-    macro_rules! defense {
+macro_rules! defense {
         ($phys:literal, $magic:literal, $dodge:literal) => {
             (
                 StatType::Defense,
@@ -47,8 +46,7 @@ pub mod create {
             )
         };
     }
-    pub(crate) use defense;
-}
+pub(in crate::character) use defense;
 
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug)]
 pub enum StatType {
@@ -132,23 +130,11 @@ impl XpCurveOption for Stat {
         const LINEAR_FACTOR: f64 = 1.7;
         const EXPONENT: f64 = 1.3;
 
-        if let Some(level) = match self {
-            Level { level, .. }
-            | Strength { level, .. }
-            | Wisdom { level, .. }
-            | Crafting { level, .. }
-            | Enhancement { level, .. }
-            | Combat { level, .. }
-            | Magic { level, .. }
-            | Luck { level, .. } => Some(*level),
+        match self {
+            Level { level, .. } | Strength { level, .. } | Wisdom { level, .. } | Crafting { level, .. } | Enhancement { level, .. } | Combat { level, .. } | Magic { level, .. } | Luck { level, .. } => Some(
+                (BASE_XP * f64::powf(*level as f64, EXPONENT) + (*level as f64 * LINEAR_FACTOR)) as u64,
+            ),
             _ => None,
-        } {
-            return Some(
-                (BASE_XP * f64::powf(level as f64, EXPONENT) + (level as f64 * LINEAR_FACTOR))
-                    as u64,
-            );
         }
-
-        None
     }
 }
